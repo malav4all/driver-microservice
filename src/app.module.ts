@@ -1,12 +1,20 @@
 import { Module } from '@nestjs/common';
 import { DriversModule } from './drivers/drivers.module';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
-    MongooseModule.forRoot(
-      'mongodb://malav:4O61EhqGlLiTWD0@ingress.imztech.io:30018/admin?replicaSet=rs0&readPreference=secondaryPreferred&directConnection=true'
-    ),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: `.env`,
+    }),
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async () => ({
+        uri: process.env.DB_URL,
+      }),
+    }),
     DriversModule,
   ],
   controllers: [],
